@@ -1,15 +1,23 @@
 {
+  "name": "fitness-app-api",
+  "version": "1.0.0",
+  "description": "A Node.js API for a fitness app, deployed on Vercel",
+  "main": "index.js",
   "scripts": {
-    "dev": "vercel dev",
-    "build": "echo 'Nothing to build'",
-    "start": "node api/signup.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "dependencies": {
-    "bcryptjs": "^2.x.x",
-    "dotenv": "^8.x.x",
-    "express": "^4.x.x",
-    "jsonwebtoken": "^8.x.x",
-    "mongoose": "^5.x.x",
-    "vercel": "^37.14.0"
+    "express": "^4.18.2",
+    "mongoose": "^6.8.0",
+    "dotenv": "^16.0.3",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": "16.x"
   }
 }
