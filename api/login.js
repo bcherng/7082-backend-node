@@ -4,21 +4,29 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/users');
 
-// Connect to MongoDB
-console.log(process.env.MONGODB_URI)
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
 
+/*
+    OPTIONAL: add OAUTH
+*/
 module.exports = async (req, res) => {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
+    
+    if (req.method === 'POST') {
+        const { username, password } = req.body;
+        const user = await User.findOne({ username });
+        
+        // Validate credentials 
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-        return res.status(401).json({ message: 'Invalid credentials' });
+        // Create and return JWT
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.json({ token });
+    } else {
+        res.status(405).json({ message: 'Method Not Allowed' });
     }
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
 };

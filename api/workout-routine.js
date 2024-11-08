@@ -1,33 +1,48 @@
 require('dotenv').config({path: "../.env"});
-const express = require('express');
 const mongoose = require('mongoose');
 const Workout = require('../models/workouts');
 
-const app = express();
-app.use(express.json());
-
-// Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
 
+/*
+    TO-DO: verify user before allowing access
+*/
+module.exports = async (req, res) => {
+    if (req.method === 'GET') {
+        const username = req.query.username;
+        const { day } = req.query;
 
-// Retrieve the full workout routine
-app.get('/api/workout-routine', async (req, res) => {
-    const userId = req.query.userId;
-    try {
-        const workout = await Workout.findOne({ userId });
+        try {
+            const workout = await Workout.findOne({ userId: username }); 
 
-        if (!workout) {
-            return res.status(404).json({ message: 'No workout found for this user' });
+            if (!workout) {
+                return res.status(404).json({ message: 'No workout found for this user' });
+            }
+            
+            const validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+            // If the day is invalid or missing, return the entire routine
+            if (!validDays.includes(day)) {
+                return res.json(workout.routine);
+            }
+
+            // Filter the routine to get only the specified day's workouts
+            const dayRoutine = workout.routine.find(([routineDay]) => routineDay === day);
+
+            // If a routine for the specified day is found, return it; otherwise, return an error message
+            if (dayRoutine) {
+                res.json({ day: dayRoutine[0], exercises: dayRoutine[1] });
+            } else {
+                res.status(404).json({ message: `No routine found for ${day}` });
+            }
+        } catch (error) {
+            res.status(500).json({ message: 'Error retrieving workout routine', error });
         }
-
-        res.json(workout.routine);
-    } catch (error) {
-        res.status(500).json({ message: 'Error retrieving workout routine' });
+    } else {
+        res.status(405).json({ message: 'Method Not Allowed' });
     }
-});
+};
 
-
-module.exports = app;

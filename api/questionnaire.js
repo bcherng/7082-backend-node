@@ -1,28 +1,42 @@
 require('dotenv').config({path: "../.env"});
 const mongoose = require('mongoose');
 const User = require('../models/users');
+const Workout = require('../models/workouts')
+const helpers = require('../utils/helpers');  
 
-// Connect to MongoDB
-console.log(process.env.MONGODB_URI)
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
 
-
+/*
+    TO-DO: verify user first before allowing access
+*/
 module.exports = async (req, res) => {
     if (req.method === 'POST') {
         try {
-            const { questionnaire, userId } = req.body;
+            await User.findByIdAndUpdate(username, { questionnaire });
+            const userRequirements = req.body.questionnaire || null;
+            const username = req.body.username;
+        
             try {
-                await User.findByIdAndUpdate(userId, { questionnaire });
-                res.json({ message: 'Questionnaire submitted successfully' });
+                // Generate the workout routine using the helper function
+                const workoutData = await helpers.formatWorkoutData(userRequirements);
+        
+                // Create a new workout document
+                const workout = await Workout.findOneAndUpdate(
+                    { username },                 // Search criteria: find by username
+                    { routine: workoutData },      // Update: set the routine to the new workout data
+                    { new: true, upsert: true }    // Options: return the updated document, insert if not found
+                );
+                res.json({ message: 'Workout routine updated and stored successfully.' });
             } catch (error) {
-                res.status(500).json({ message: 'Error submitting questionnaire' });
+                console.error('Error generating workout routine:', error);
+                res.status(500).json({ message: 'Error generating workout routine.' });
             }
         } catch (error) {
-            res.status(500).json({ message: 'Error submitting questionnaire', error });
-        }
+            res.status(500).json({ message: 'Error submitting questionnaire' });
+        } 
     } else if (req.method === 'GET') {
         const { username } = req.query; 
         if (!username) {
@@ -42,3 +56,4 @@ module.exports = async (req, res) => {
         res.status(405).json({ message: 'Method Not Allowed' });
     }
 };
+
