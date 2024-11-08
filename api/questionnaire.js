@@ -24,9 +24,12 @@ module.exports = async (req, res) => {
             res.status(500).json({ message: 'Error submitting questionnaire', error });
         }
     } else if (req.method === 'GET') {
-        const { userId } = req.query; 
+        const { username } = req.query; 
+        if (!username) {
+            return res.status(400).json({ message: 'username is required' });
+          }
         try {
-            const user = await User.findById(userId);
+            const user = await User.findOne({ username });
             if (user) {
                 res.status(200).json({ questionnaire: user.questionnaire });
             } else {
