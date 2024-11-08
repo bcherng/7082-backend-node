@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const workoutSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    routine: { type: Object, required: true }  // Store workout routine by day
+    username: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    routine: { type: Object, required: true }  
 });
 
 module.exports = mongoose.model('Workout', workoutSchema);
