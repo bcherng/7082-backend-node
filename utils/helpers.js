@@ -1,9 +1,9 @@
-require("dotenv").config({path: '../.env'});
+require("dotenv").config({ path: '../.env' });
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 // Function to generate workout routine
-async function generateRoutine(userRequirements = null) {
-    console.log(process.env.GENAI_API);
+async function generateRoutine(userRequirements = "") {
+    console.log("API Key:", process.env.GENAI_API); // To check if the API key is loaded
     const genAI = new GoogleGenerativeAI(process.env.GENAI_API);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -18,17 +18,25 @@ async function generateRoutine(userRequirements = null) {
         Tailor the response to the following requirements if they exist, otherwise assume a beginner with the goal of getting fit.
     `;
 
-    const result = await model.generateContent(baseRequirements.concat("", userRequirements));
-    return result;
+    try {
+        const result = await model.generateContent(`${baseRequirements} ${userRequirements}`);
+        return result;
+    } catch (error) {
+        console.error("Error in generateRoutine:", error);
+        throw new Error("Failed to generate workout routine.");
+    }
 }
 
 // Function to sanitize and extract workout data from response
 function extractContent(response) {
-    console.log(response);
-    const content = response.response.candidates[0].content.parts[0].text; // Return the raw response
-    const cleanedContent = content.replace(/```json|```/g, '').trim();
-    console.log(cleanedContent);
-    return JSON.parse(cleanedContent); // Parse the JSON response
+    try {
+        const content = response.candidates[0].content.parts[0].text;
+        const cleanedContent = content.replace(/```json|```/g, '').trim();
+        return JSON.parse(cleanedContent);
+    } catch (error) {
+        console.error("Error parsing workout data:", error);
+        throw new Error("Failed to parse workout data.");
+    }
 }
 
 // Validate the workout data structure
@@ -60,6 +68,14 @@ async function formatWorkoutData(userRequirements) {
     return workoutData;
 }
 
-console.log(formatWorkoutData(""));
+// Testing the async function
+// (async () => {
+//     try {
+//         const data = await formatWorkoutData("");
+//         console.log("Formatted Workout Data:", data);
+//     } catch (error) {
+//         console.error("Error during workout data generation:", error);
+//     }
+// })();
 
 module.exports = { formatWorkoutData };
