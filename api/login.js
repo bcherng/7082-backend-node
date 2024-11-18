@@ -1,4 +1,5 @@
 require('dotenv').config({path: "../.env"});
+const cors = require('cors');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -13,6 +14,17 @@ mongoose.connect(process.env.MONGODB_URI, {
     OPTIONAL: add OAUTH
 */
 module.exports = async (req, res) => {
+
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:5500');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    
+    if (req.method === 'OPTIONS') {
+        // Respond to preflight requests
+        return res.status(200).end();
+    }
     
     if (req.method === 'POST') {
         const { username, password } = req.body;
