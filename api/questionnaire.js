@@ -51,7 +51,7 @@ module.exports = async (req, res) => {
             res.status(500).json({ message: 'Error processing request.', error: error.message });
         }
     } else if (req.method === 'GET') {
-        const { username } = req.query;
+        const { username } = req.body.username;
 
         if (!username) {
             return res.status(400).json({ message: 'Username is required' });
