@@ -8,15 +8,20 @@ async function generateRoutine(userRequirements = "") {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const baseRequirements = `
-        Generate a weekly workout routine in the format of 
-        {
-            "Monday": [["exercise 1", "rep per set", "sets", "expected time"]]
-        }
-        The output is to be parsed programmatically. Do not add unnecessary information. 
-        Adhere to the strict format requirements. There may be more than 1 exercise per day.
-        Response must be a JavaScript object. Fill days without exercise with [["Rest", "N/A", "N/A", "N/A"]].
-        Tailor the response to the following requirements if they exist, otherwise assume a beginner with the goal of getting fit.
-    `;
+    Generate a weekly workout routine in the format of a JavaScript object, without markdown formatting. The output should be a clean, valid JSON response. 
+    Do not wrap the response in any code blocks or markdown. The format should look like this:
+
+    {
+        "Monday": [["exercise 1", "rep per set", "sets", "expected time"]],
+        "Tuesday": [["Rest", "N/A", "N/A", "N/A"]],
+        ...
+    }
+
+    The response must be a valid JavaScript object. Do not add unnecessary text, and make sure there are no markdown code blocks or other formatting.
+
+    Tailor the response to the following requirements if they exist, otherwise assume a beginner with the goal of getting fit.
+`;
+
 
     try {
         const result = await model.generateContent(`${baseRequirements} ${userRequirements}`);
