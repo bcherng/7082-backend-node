@@ -31,17 +31,35 @@ module.exports = async (req, res) => {
             
             const validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-            // If the day is invalid or missing, return the entire routine
-            if (!validDays.includes(day)) {
-                return res.json(workout.routine);
+            if (!day || !validDays.includes(day)) {
+                const transformedRoutine = Object.entries(workout.routine).reduce((acc, [key, exercises]) => {
+                    acc[key] = exercises.map((exercise) => ({
+                        name: exercise[0],
+                        reps: exercise[1],
+                        sets: exercise[2],
+                        rest: exercise[3],
+                    }));
+                    return acc;
+                }, {});
+
+                return res.json(transformedRoutine);
             }
 
             // Filter the routine to get only the specified day's workouts
-            const dayRoutine = workout.routine.find(([routineDay]) => routineDay === day);
+            // const dayRoutine = workout.routine.find(([routineDay]) => routineDay === day);
+            if (dayRoutine && Array.isArray(dayRoutine)) {
+                const transformedRoutine = dayRoutine.map((exercise) => ({
+                    name: exercise[0],
+                    reps: exercise[1],
+                    sets: exercise[2],
+                    rest: exercise[3],
+                }));
+
+                return res.json({ day, exercises: transformedRoutine });
 
             // If a routine for the specified day is found, return it; otherwise, return an error message
-            if (dayRoutine) {
-                res.json({ day: dayRoutine[0], exercises: dayRoutine[1] });
+            // if (dayRoutine) {
+            //     res.json({ day: dayRoutine[0], exercises: dayRoutine[1] });
             } else {
                 res.status(404).json({ message: `No routine found for ${day}` });
             }
