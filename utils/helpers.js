@@ -30,8 +30,11 @@ async function generateRoutine(userRequirements = "") {
 // Function to sanitize and extract workout data from response
 function extractContent(response) {
     try {
+        console.log(Object.values(response));
         const content = response.response.candidates[0].content.parts[0].text;
+        console.log(Object.values(content));
         const cleanedContent = content.replace(/```json|```/g, '').trim();
+        console.log(Object.values(cleanedContent));
         return JSON.parse(cleanedContent);
     } catch (error) {
         console.error("Error parsing workout data:", error);
