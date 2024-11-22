@@ -32,7 +32,7 @@ function extractContent(response) {
     try {
         console.log(Object.values(response));
         const content = response.response.candidates[0].content.parts[0].text;
-        console.log(Object.values(content));
+        console.log(response.response.candidates[0].content);
         const cleanedContent = content.replace(/```json|```/g, '').trim();
         console.log(Object.values(cleanedContent));
         return JSON.parse(cleanedContent);
