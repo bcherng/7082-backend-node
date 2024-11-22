@@ -48,7 +48,7 @@ module.exports = async (req, res) => {
             res.json({ message: 'Workout routine updated and stored successfully.', workout });
         } catch (error) {
             console.error('Error processing request:', error);
-            res.status(500).json({ message: 'Error processing request.', error });
+            res.status(500).json({ message: 'Error processing request.', error: error.message });
         }
     } else if (req.method === 'GET') {
         const { username } = req.query;
