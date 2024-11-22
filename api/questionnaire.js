@@ -1,4 +1,5 @@
 require('dotenv').config({ path: "../.env" });
+const cors = require('cors');
 const mongoose = require('mongoose');
 const User = require('../models/users');
 const Workout = require('../models/workouts');
@@ -16,6 +17,11 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        // Respond to preflight requests
+        return res.status(200).end();
+    }
 
     if (req.method === 'POST') {
         const username = req.body.username;
