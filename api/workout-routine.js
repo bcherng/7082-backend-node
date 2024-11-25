@@ -1,6 +1,7 @@
 require('dotenv').config({path: "../.env"});
 const mongoose = require('mongoose');
 const Workout = require('../models/workouts');
+const User = require('../models/user');
 
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
@@ -23,6 +24,13 @@ module.exports = async (req, res) => {
         const { day } = req.query;
 
         try {
+
+            // Check if the user exists
+            const user = await User.findOne({ username });
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+
             const workout = await Workout.findOne({ username }); 
 
             if (!workout) {
