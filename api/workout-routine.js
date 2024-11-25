@@ -26,10 +26,10 @@ module.exports = async (req, res) => {
         try {
 
             // Check if the user exists
-            // const user = await User.findOne({ username });
-            // if (!user) {
-            //     return res.status(404).json({ message: 'User not found' });
-            // }
+            const user = await User.findOne({ username });
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
 
             const workout = await Workout.findOne({ username }); 
 
