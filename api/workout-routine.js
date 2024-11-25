@@ -23,7 +23,7 @@ module.exports = async (req, res) => {
         const { day } = req.query;
 
         try {
-            const workout = await Workout.findOne({ userId: username }); 
+            const workout = await Workout.findOne({ username }); 
 
             if (!workout) {
                 return res.status(404).json({ message: 'No workout found for this user' });
